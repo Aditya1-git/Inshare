@@ -14,8 +14,8 @@ const toast = document.querySelector(".toast");
 const emailForm = document.querySelector("#emailForm");
 
 const host = "https://inshare-backend-05zd.onrender.com";
-const uploadURL = `${host}api/files`;
-const emailURL = `${host}api/files/send`;
+const uploadURL = `${host}/api/files`;
+const emailURL = `${host}/api/files/send`;
 const maxAllowedSize = 100 * 1024 * 1024; //100 mb
 
 let selectedFiles = [];
@@ -61,7 +61,7 @@ function copyText(){
 
     setTimeout(() => {
         copyBtn.classList.add("fa-copy");
-        copyBtn.classList.add(" fa-regular");
+        copyBtn.classList.add("fa-regular");
         copyBtn.classList.remove("fa-solid");
         copyBtn.classList.remove("fa-check");
     }, 1500);
@@ -69,12 +69,15 @@ function copyText(){
 }
 
 const uploadFile = () => {
+    sharingContainer.style.display = "none";
+    progressContainer.style.display = "none";
+    fileUrlInput.value = "";
     if(selectedFiles.length > 1){
         fileInput.value = "";
         showTost("Upload only 1 file");
         return;
     }
-    if(selectedFiles[0].length > maxAllowedSize){
+    if(selectedFiles[0].size > maxAllowedSize){
         showTost("Can't upload more than 100MB");
         fileInput.value = "";
         return;
@@ -87,7 +90,12 @@ const uploadFile = () => {
     xhr.onreadystatechange = () => {
         if(xhr.readyState === XMLHttpRequest.DONE){
             console.log(xhr.response);
-            showLink(JSON.parse(xhr.response));
+            try{
+                const data = JSON.parse(xhr.response);
+                showLink(data);
+            }catch(err){
+                showTost("Upload failed");
+            }
         }
     }
     
@@ -105,7 +113,7 @@ const updateProgress = (e) => {
     // console.log(percent);
     bgProgress.style.width = `${percent}%`;
     percentDiv.innerText = percent;
-    progressBar.style.trasform = `scaleX(${percent / 100})`;
+    progressBar.style.transform = `scaleX(${percent / 100})`;
 }
 
 const showLink = ({file : url}) => {
@@ -136,8 +144,9 @@ emailForm.addEventListener("submit" , (e) => {
             "content-Type": "application/json"
         },
         body: JSON.stringify(formData)
-    }).then(res => res.json())
-      .then(({success}) => {
+    }).then(res => { if (!res.ok) throw new Error("Failed");
+    return res.json();
+    }).then(({success}) => {
         if(success){
             sharingContainer.style.display="none";
             showTost("Email Sent");
