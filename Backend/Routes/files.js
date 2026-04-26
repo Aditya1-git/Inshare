@@ -4,6 +4,10 @@ const path = require("path");
 const File = require("../models/file");
 const { v4: uuidv4 } = require("uuid");
 
+function getBaseUrl(req) {
+    return `${req.protocol}://${req.get('host')}`;
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '..', 'uploads'));
@@ -40,7 +44,7 @@ router.post("/", (req, res) => {
             const response = await file.save();
 
             return res.json({
-                file: `${process.env.APP_BASE_URL}/files/${response.uuid}`,
+                file: `${getBaseUrl(req)}/files/${response.uuid}`,
             });
 
         } catch (error) {
@@ -79,7 +83,7 @@ router.post("/send", async (req, res) => {
         text: `${emailFrom} shared a file with you`,
         html: require('../Routes/services/emailTemplate')({
             emailFrom,
-            downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
+            downloadLink: `${getBaseUrl(req)}/files/${file.uuid}`,
             size: parseInt(file.size / 1000) + 'KB',
             expires: '24 hours'
         })

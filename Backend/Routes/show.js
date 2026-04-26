@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const fs = require('fs');
 const File = require('../models/file');
+
+function getBaseUrl(req) {
+    return `${req.protocol}://${req.get('host')}`;
+}
 
 
 router.get('/download/:uuid', async (req, res) => {
@@ -13,6 +18,11 @@ router.get('/download/:uuid', async (req, res) => {
         }
 
         const filePath = path.join(__dirname, '..', file.path);
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).render('download', { error: 'File not found.' });
+        }
+
         return res.download(filePath);
 
     } catch (err) {
@@ -36,12 +46,12 @@ router.get('/:uuid', async (req,res) => {
             uuid: file.uuid,
             fileName: file.filename,
             fileSize: file.size,
-            downloadLink: `${process.env.APP_BASE_URL}/files/download/${file.uuid}`
+            downloadLink: `${getBaseUrl(req)}/files/download/${file.uuid}`
         });
 
     } catch (err) {
         console.error(err);
-        return res.render("download", { err: 'something went wrong' });
+        return res.status(500).render("download", { error: 'Something went wrong.' });
     }
 });
 
