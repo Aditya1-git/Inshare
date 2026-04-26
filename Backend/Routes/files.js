@@ -5,7 +5,9 @@ const File = require("../models/file");
 const { v4: uuidv4 } = require("uuid");
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, "uploads/"),
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '..', 'uploads'));
+    },
     filename: (req, file, cb) => {
         const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
         cb(null, uniqueName);
@@ -14,7 +16,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    limits: { fileSize: 1000000 * 100 },
+    limits: { fileSize: 100 * 1024 * 1024 },
 }).single("myfile");
 
 router.post("/", (req, res) => {
@@ -31,51 +33,59 @@ router.post("/", (req, res) => {
             const file = new File({
                 filename: req.file.filename,
                 uuid: uuidv4(),
-                path: req.file.path,
+                path: `uploads/${req.file.filename}`,
                 size: req.file.size,
             });
 
             const response = await file.save();
+
             return res.json({
                 file: `${process.env.APP_BASE_URL}/files/${response.uuid}`,
             });
+
         } catch (error) {
             return res.status(500).send({ error: error.message });
         }
     });
 });
 
-router.post("/send" , async (req,res) => {
-     const { uuid,emailTo,emailFrom } = req.body; // here we receive json data which is possible through a json parser in server.js in line 8
+router.post("/send", async (req, res) => {
+    const { uuid, emailTo, emailFrom } = req.body;
 
-     if(!uuid || !emailTo || !emailFrom){
-        return res.status(422).send({error: 'All feilds are required.'});
-     }
-     //get data from dtabase
-     const file = await File.findOne({uuid : uuid});
-     if(file.sender){
-        return res.status(422).send({error: 'Email already sent'});
-     }
-     file.sender = emailFrom;
-     file.receiver = emailTo;
-     const response = await file.save();
+    if (!uuid || !emailTo || !emailFrom) {
+        return res.status(422).send({ error: 'All fields are required.' });
+    }
 
-     //send email
-     const sendMail = require('./services/emailService');
-     sendMail({ 
+    const file = await File.findOne({ uuid });
+
+    if (!file) {
+        return res.status(404).send({ error: "File not found" });
+    }
+
+    if (file.sender) {
+        return res.status(422).send({ error: 'Email already sent' });
+    }
+
+    file.sender = emailFrom;
+    file.receiver = emailTo;
+    await file.save();
+
+    const sendMail = require('./services/emailService');
+
+    await sendMail({
         from: emailFrom,
         to: emailTo,
         subject: 'File shared using app',
         text: `${emailFrom} shared a file with you`,
         html: require('../Routes/services/emailTemplate')({
-            emailFrom: emailFrom,
+            emailFrom,
             downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
-            size: parseInt(file.size/1000)+ 'KB',
+            size: parseInt(file.size / 1000) + 'KB',
             expires: '24 hours'
         })
-     });
-     return res.send({success: true});
+    });
 
+    return res.send({ success: true });
 });
 
 module.exports = router;

@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 async function sendMail({from , to , subject , text , html}){
     let transporter  = nodemailer.createTransport({
         host: process.env.MAILTRAP_HOST,
-        PORT: process.env.MAILTRAP_PORT,
+        port: process.env.MAILTRAP_PORT,
         secure: false,
         auth: {
             user: process.env.MAIL_USER,
