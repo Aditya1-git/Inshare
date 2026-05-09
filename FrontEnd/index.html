@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,28 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
+
 <body>
     <section class="upload-container">
         <div class="drop-zone">
             <div class="icon-container">
-                <img src="./drop_file1.svg" alt="file.icon" class= "center" draggable="false">
-                <img src="./drop_file1.svg" alt="file.icon" class= "left" draggable="false">
-                <img src="./drop_file1.svg" alt="file.icon" class= "right" draggable="false">
+                <img src="./drop_file1.svg" alt="file.icon" class="center" draggable="false">
+                <img src="./drop_file1.svg" alt="file.icon" class="left" draggable="false">
+                <img src="./drop_file1.svg" alt="file.icon" class="right" draggable="false">
             </div>
             <input type="file" id="fileInput" hidden>
             <div class="title">Drop your Files here or, <span class="browseBtn"> browse</span></div>
+        </div>
+        <div class="text-area hidden">
+            <textarea placeholder="Type or paste your text here..." maxlength="5000"></textarea>
+
+            <div class="text-info">
+                <span class="char-count">0 / 5000</span>
+            </div>
+        </div>
+        <div id="change">
+            <button class="share-file" type="button">share File</button>
+            <button class="share-text" type="button">share Text</button>
         </div>
         <div class="progress-container">
             <div class="bg-progress"></div>
@@ -25,13 +38,34 @@
                 <div class="percent-container"><span id="percent">0</span>%</div>
                 <div class="progress-bar"></div>
             </div>
-            </div>
+        </div>
         <div class="sharing-container">
-            <p class="expire">Link expires in 24 hrs </p>
-            <div class="input-container">
-                <input type="text" id="fileURL"  readonly value="">
-                <i class="fa-regular fa-copy copy-icon" onclick="copyText()"></i>
+
+            <div class="link-section">
+                <p class="expire">Link expires in 24 hrs </p>
+                <div class="input-container">
+                    <input type="text" id="fileURL" readonly value="">
+                    <i class="fa-regular fa-copy copy-icon" onclick="copyText()"></i>
+                </div>
             </div>
+
+            <div class="code-processor hidden">
+                <div class="qr-code" id="qrcode"><img src="./Rickrolling_QR_code.png" alt="qr-code"></div>
+                <div class="code-container">
+                    <div class="generate-section">
+                        <div class="code-section">
+                            <p>code: </p>
+                            <p class="code"> 1234</p>
+                        </div>
+                        <button class="generate" type="button">Generate code</button>
+                    </div>
+                    <div class="show-section">
+                        <input class="input_code" type="text" placeholder="Enter code">
+                        <button type="button" class="show_text">show text</button>
+                    </div>
+                </div>
+            </div>
+
             <p>Or Send Via Email</p>
             <div class="email-container">
                 <form id="emailForm">
@@ -51,5 +85,7 @@
     <div class="bg-photo"></div>
     <div class="toast">copied to clipboard</div>
     <script src="script.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> -->
 </body>
+
 </html>

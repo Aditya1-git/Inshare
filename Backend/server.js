@@ -2,6 +2,7 @@ const express = require('express');
 const PORT = process.env.PORT || 3000;
 const path = require('path');
 const cors = require('cors');
+const textRoute = require("./Routes/text"); // adding text feature
 
 const app = express();
 app.set('trust proxy', 1);
@@ -29,6 +30,7 @@ app.set('view engine' , 'ejs');
 
 app.use('/api/files',require('./Routes/files'));
 app.use('/files' , require('./Routes/show'));
+app.use("/api/text" , textRoute); // adding text route
 
 
 app.listen(PORT , () => {
