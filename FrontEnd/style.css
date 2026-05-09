@@ -6,7 +6,7 @@
     --border: #e5e7eb;
     --text: #1f2937;
     --muted: #6b7280;
-    --container-width: 520px;
+    --container-width: 420px;
 }
 
 /* Global */
@@ -18,15 +18,26 @@ body,html{
 }
 
 /* Layout */
-body , .drop-zone , .upload-container{
+.drop-zone,
+.upload-container{
     display:flex;
     align-items:center;
     justify-content:center;
     flex-direction:column;
 }
+body{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:30px;
+    box-sizing:border-box;
+}
 
 /* Card */
 .upload-container{
+    max-width:100%;
+    box-sizing:border-box;
     position: relative; /* needed for copy icon */
     background: var(--card);
     border-radius: 16px;
@@ -36,7 +47,7 @@ body , .drop-zone , .upload-container{
 }
 
 .upload-container:hover{
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.12);
 }
 
@@ -60,7 +71,7 @@ body , .drop-zone , .upload-container{
     width: var(--container-width);
     min-height: 220px;
     border: 2px dashed var(--border);
-    margin: 20px;
+    margin: 10px;
     border-radius: 12px;
     background: linear-gradient(145deg, #ffffff, #f3f6fb);
     transition: all 0.25s ease;
@@ -160,7 +171,7 @@ body , .drop-zone , .upload-container{
 /* Sharing container */
 .sharing-container{
     width: var(--container-width);
-    margin: 15px 0;
+    margin: 10px 0;
 }
 
 /* Inputs */
@@ -263,8 +274,181 @@ p{
     text-align: center;
 }
 
+
+/* Adding  new features */
+
+/* text area */
+.text-area{
+    width: var(--container-width);
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 15px;
+    box-sizing: border-box;
+    transition: 0.3s ease;
+    margin:10px;
+}
+
+.text-area:hover{
+    border-color: var(--secondary);
+}
+
+.text-area textarea{
+    width: 100%;
+    min-height: 180px;
+    resize: none;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background: transparent;
+    font-family: 'Inter', system-ui;
+    box-sizing: border-box;
+}
+
+.text-area textarea::placeholder{
+    color: var(--muted);
+}
+
+.text-info{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:10px;
+    font-size:13px;
+    color: var(--muted);
+}
+/* change between share and text  */
+#change{
+    gap:2px;
+}
+/* share file btn section */
+.share-file{
+  background: #79839a;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.share-file:hover{
+    background: #2563eb;
+  transform: scale(1.05);
+}
+/* share text btn section */
+.share-text{
+  background: #79839a;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.share-text:hover{
+    background: #2563eb;
+  transform: scale(1.05);
+}
+
+/* full code and qr section */
+.code-processor{
+    height:150px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap:20px;
+}
+.qr-code{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:12px;
+    border:2px solid var(--border);
+    border-radius:16px;
+    background:white;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.qr-code img{
+    width:120px;
+    height:120px;
+    object-fit:contain;
+    border-radius:8px;
+}
+.code-container{
+    display: flex;
+    flex-direction: column;
+    gap:10px
+}
+.generate-section{
+    display:flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap:10px;
+}
+.show-section{
+    display: flex;
+    gap:15px;
+}
+.generate-section .generate{
+    outline:none;
+    border:none;
+    height:40px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+    background: #79839a;
+    color:white;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.generate:hover{
+    transform:scale(1.05);
+}
+.code-section{
+    display: flex;
+    /* padding-left:50px; */
+}
+.hidden{
+    display:none;
+}
+
+.show-section .input_code{
+    border:2px solid black;
+
+}
+.show_text{
+    outline:none;
+    border:none;
+    height:40px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+    background: #79839a;
+    color:white;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.show_text:hover{
+    transform:scale(1.05);
+}
+
+
+
+
+
+
 /* Responsive */
 @media screen and (max-width: 900px){
+    body{
+        align-items:flex-start;
+    }
     :root{
         --container-width:320px;
     }

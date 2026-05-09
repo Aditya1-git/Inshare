@@ -109,3 +109,24 @@ npm run dev
 ##  Summary
 
 This project demonstrates a complete file-sharing workflow using a Node.js backend and simple frontend, including upload handling, link generation, and email sharing.
+
+---
+
+##  What I Changed Recently
+
+* Created a new text feature route in `Routes/text.js` under `/api/text`.
+* Added text generation logic that creates a unique 6-character code for each saved text entry.
+* Added QR code generation using the `qrcode` package so each generated code also has a QR image.
+* Created the text database model in `models/text.js` to store `text`, `code`, and `qrCode`.
+* Wired the new text route into the server in `server.js`.
+* Added the `qrcode` dependency in `package.json`.
+* Kept the existing file-sharing flow for uploads, download links, and email sharing.
+
+---
+
+##  What This New Text Route Does
+
+* `POST /api/text` creates a new text record.
+* It generates a unique code and a QR code for that code.
+* `GET /api/text/:code` looks up the saved text by code and returns it.
+* The route stores the generated data in MongoDB through the `Text` model.

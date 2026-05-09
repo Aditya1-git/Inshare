@@ -8,7 +8,18 @@ const progressContainer = document.querySelector(".progress-container");
 const copyBtn = document.querySelector(".fa-regular");
 const fileUrlInput = document.querySelector("#fileURL");
 const sharingContainer = document.querySelector(".sharing-container");
-const toast = document.querySelector(".toast");
+const code = document.querySelector(".code");
+const link_section = document.querySelector(".link-section");
+const code_processor = document.querySelector(".code-processor");
+const share_file = document.querySelector(".share-file");
+const share_text = document.querySelector(".share-text");
+const qr_code = document.querySelector(".qr-code");
+const generate = document.querySelector(".generate");
+const input_code = document.querySelector(".input_code");
+const show_text = document.querySelector(".show_text");
+const textArea = document.querySelector(".text-area textarea");
+const textAreaContainer = document.querySelector(".text-area");
+const dropZoneContainer = document.querySelector(".drop-zone");
 
 
 const emailForm = document.querySelector("#emailForm");
@@ -163,3 +174,89 @@ const showTost = (msg) => {
         toast.style.transform = "translateY(70px)";
     },2000);
 };
+
+// New feature1 added
+
+share_file.addEventListener("click", () => {
+    dropZoneContainer.classList.remove("hidden");
+    textAreaContainer.classList.add("hidden");
+
+
+    link_section.classList.remove("hidden");
+    code_processor.classList.add("hidden");
+
+    share_file.style.background = "#2563eb";
+    share_text.style.background = "#79839a";
+})
+share_text.addEventListener("click" ,() => {
+    textAreaContainer.classList.remove("hidden");
+    dropZoneContainer.classList.add("hidden");
+
+    code_processor.classList.remove("hidden");
+    link_section.classList.add("hidden");
+
+    share_text.style.background = "#2563eb";
+    share_file.style.background = "#79839a";
+})
+
+generate.addEventListener("click" , async () => {
+    const text = textArea.value.trim();
+
+    if(!text){
+        showTost("Please enter some text");
+        return;
+    }
+
+    try{
+        generate.disabled = true;
+        generate.innerText = "Generating...";
+
+        const response = await fetch(`${host}/api/text` , {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({ text })
+        });
+
+        if(!response.ok){
+            throw new Error("Failed");
+        }
+        const data = await response.json();
+        showgeneratedData(data);
+    }catch(err){
+        console.log("Failed to generate");
+        showTost("failed to generate");
+    }finally{
+        generate.disabled = false;
+        generate.innerText = "Generate code";
+    }
+})
+
+const showgeneratedData = (data) => {
+    code.innerHTML = data.code;
+
+    qrImage.src = data.qrCode;
+    // issue
+}
+
+show_text.addEventListener("click" , async () => {
+
+    const enteredCode = input_code.value.trim();
+
+    if(!enteredCode){
+        showTost("Enter the code");
+        return;
+    }
+    try{
+        const resopnse = await fetch(`${host}/api/text/${enteredCode}`);
+        if(!resopnse.ok){
+            throw new Error("Invalid code");
+        }
+
+        const data = await  resopnse.json();
+        textArea.value = data.text;
+    }catch(err){
+        showTost("Text not found");
+    }
+})
