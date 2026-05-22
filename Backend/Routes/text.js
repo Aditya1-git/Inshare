@@ -3,6 +3,12 @@ const router = express.Router();
 const QRCode = require("qrcode");
 
 const Text = require("../models/text");
+const sendMail = require("./services/emailService");
+const emailTemplate = require("./services/emailTemplate");
+
+function getBaseUrl(req) {
+    return `${req.protocol}://${req.get("host")}`;
+}
 
 function generateCode(length = 6){
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -72,3 +78,40 @@ router.get("/:code", async(req,res) => {
 });
 
 module.exports = router;
+
+router.post("/send", async (req, res) => {
+    try {
+        const { code, emailTo, emailFrom } = req.body;
+
+        if (!code || !emailTo || !emailFrom) {
+            return res.status(422).send({ error: "All fields are required." });
+        }
+
+        const textData = await Text.findOne({ code });
+
+        if (!textData) {
+            return res.status(404).send({ error: "Text not found" });
+        }
+
+        const textLink = `${getBaseUrl(req)}/api/text/${textData.code}`;
+
+        await sendMail({
+            from: emailFrom,
+            to: emailTo,
+            subject: "Text shared using app",
+            text: `${emailFrom} shared text with you. Code: ${textData.code}. Link: ${textLink}`,
+            html: emailTemplate({
+                emailFrom,
+                downloadLink: textLink,
+                expires: "24 hours",
+                shareType: "text",
+                buttonLabel: "View text",
+                meta: `Use code ${textData.code} to view the text.`
+            })
+        });
+
+        return res.send({ success: true });
+    } catch (error) {
+        return res.status(500).send({ error: "Unable to send email" });
+    }
+});
