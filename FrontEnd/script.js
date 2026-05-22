@@ -27,9 +27,12 @@ const emailForm = document.querySelector("#emailForm");
 const host = "https://inshare-backend-05zd.onrender.com";
 const uploadURL = `${host}/api/files`;
 const emailURL = `${host}/api/files/send`;
+const textEmailURL = `${host}/api/text/send`;
 const maxAllowedSize = 100 * 1024 * 1024; //100 mb
 
 let selectedFiles = [];
+let activeShareType = "file";
+let latestTextCode = "";
 dropZone.addEventListener("dragover" , (e) => {
     console.log("dragging");
     e.preventDefault();
@@ -141,15 +144,30 @@ emailForm.addEventListener("submit" , (e) => {
     e.preventDefault();
     console.log("submit form");
     const url = fileUrlInput.value;
-    const formData = {
-        uuid : url.split("/").splice(-1,1)[0],
-        emailTo: emailForm.elements["to-email"].value,
-        emailFrom: emailForm.elements["from-email"].value
+    const emailTo = emailForm.elements["to-email"].value;
+    const emailFrom = emailForm.elements["from-email"].value;
+
+    const isTextShare = activeShareType === "text";
+    const formData = isTextShare
+        ? {
+            code: latestTextCode,
+            emailTo,
+            emailFrom
+        }
+        : {
+            uuid : url.split("/").splice(-1,1)[0],
+            emailTo,
+            emailFrom
+        };
+
+    if (isTextShare && !latestTextCode) {
+        showTost("Generate text code first");
+        return;
     }
     emailForm[2].setAttribute("disabled" , "true");
     console.table(formData);
 
-    fetch(emailURL, {
+    fetch(isTextShare ? textEmailURL : emailURL, {
         method: "POST",
         headers: {
             "content-Type": "application/json"
@@ -178,6 +196,7 @@ const showTost = (msg) => {
 // New feature1 added
 
 share_file.addEventListener("click", () => {
+    activeShareType = "file";
     dropZoneContainer.classList.remove("hidden");
     textAreaContainer.classList.add("hidden");
 
@@ -189,6 +208,7 @@ share_file.addEventListener("click", () => {
     share_text.style.background = "#79839a";
 })
 share_text.addEventListener("click" ,() => {
+    activeShareType = "text";
     textAreaContainer.classList.remove("hidden");
     dropZoneContainer.classList.add("hidden");
 
@@ -234,10 +254,13 @@ generate.addEventListener("click" , async () => {
 })
 
 const showgeneratedData = (data) => {
+    latestTextCode = data.code;
     code.innerHTML = data.code;
+    fileUrlInput.value = `${host}/api/text/${data.code}`;
+    sharingContainer.style.display = "block";
+    emailForm.querySelector("button").removeAttribute("disabled");
 
     qrImage.src = data.qrCode;
-    // issue
 }
 
 show_text.addEventListener("click" , async () => {
