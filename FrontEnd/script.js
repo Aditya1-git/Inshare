@@ -20,6 +20,7 @@ const show_text = document.querySelector(".show_text");
 const textArea = document.querySelector(".text-area textarea");
 const textAreaContainer = document.querySelector(".text-area");
 const dropZoneContainer = document.querySelector(".drop-zone");
+const toast = document.querySelector(".toast");
 
 
 const emailForm = document.querySelector("#emailForm");
@@ -165,6 +166,7 @@ emailForm.addEventListener("submit" , (e) => {
         return;
     }
     emailForm[2].setAttribute("disabled" , "true");
+    showTost("Sending email...");
     console.table(formData);
 
     fetch(isTextShare ? textEmailURL : emailURL, {
