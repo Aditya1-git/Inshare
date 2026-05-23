@@ -75,21 +75,33 @@ router.post("/send", async (req, res) => {
     await file.save();
 
     const sendMail = require('./services/emailService');
+    const emailTemplate = require('../Routes/services/emailTemplate');
 
-    await sendMail({
-        from: emailFrom,
-        to: emailTo,
-        subject: 'File shared using app',
-        text: `${emailFrom} shared a file with you`,
-        html: require('../Routes/services/emailTemplate')({
-            emailFrom,
-            downloadLink: `${getBaseUrl(req)}/files/${file.uuid}`,
-            size: parseInt(file.size / 1000) + 'KB',
-            expires: '24 hours'
-        })
-    });
+    console.log('Sending email', { uuid: file.uuid, emailFrom, emailTo });
+    try {
+        await sendMail({
+            from: emailFrom,
+            to: emailTo,
+            subject: 'File shared using app',
+            text: `${emailFrom} shared a file with you`,
+            html: emailTemplate({
+                emailFrom,
+                downloadLink: `${getBaseUrl(req)}/files/${file.uuid}`,
+                size: parseInt(file.size / 1000) + 'KB',
+                expires: '24 hours'
+            })
+        });
 
-    return res.send({ success: true });
+        console.log('Email send succeeded for', file.uuid);
+        return res.send({ success: true });
+    } catch (err) {
+        console.error('Failed to send email for', file.uuid, err);
+        // revert sender/receiver fields since send failed
+        file.sender = undefined;
+        file.receiver = undefined;
+        await file.save();
+        return res.status(500).send({ error: 'Failed to send email' });
+    }
 });
 
 module.exports = router;
