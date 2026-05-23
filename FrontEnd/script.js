@@ -182,7 +182,10 @@ emailForm.addEventListener("submit" , (e) => {
             sharingContainer.style.display="none";
             showTost("Email Sent");
         }
-        // console.log(data);
+    }).catch(err => {
+        console.error('Send failed', err);
+        showTost('Failed to send email');
+        emailForm[2].removeAttribute('disabled');
     })
 })
 let toastTimer;
